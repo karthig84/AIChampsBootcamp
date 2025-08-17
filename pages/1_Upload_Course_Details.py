@@ -4,7 +4,7 @@ import tempfile
 import os
 import pandas as pd
 import chardet
-from langchain.vectorstores import Chroma
+from langchain_community.vectorstores import Chroma
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
