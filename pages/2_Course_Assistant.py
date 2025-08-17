@@ -3,28 +3,26 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
-import os
 
 st.title("Course Assistant")
 
-# Verify login
+# --- Login Check ---
 if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
     st.error("🚫 You must log in first.")
     st.stop()
 
 try:
-    # --- Load Parameters ---
+    # --- Load OpenAI API Key ---
     apikey = st.secrets["OPENAI"]["OPENAI_API_KEY"]
 
     # --- Load FAISS Vectorstore ---
-    PERSIST_DIR = "./faiss_db"  # Update path if needed
-    embeddings = OpenAIEmbeddings(api_key=apikey, model="text-embedding-3-small")
-
-    if not os.path.exists(PERSIST_DIR):
-        st.error(f"❌ FAISS database not found at `{PERSIST_DIR}`. Please upload course data first.")
-        st.stop()
-
-    vectorstore = FAISS.load_local(PERSIST_DIR, embeddings)
+    PERSIST_DIR = "./faiss_db"  # Path to your saved FAISS index
+    embeddings = OpenAIEmbeddings(api_key=apikey, model='text-embedding-3-small')
+    vectorstore = FAISS.load_local(
+        folder_path=PERSIST_DIR,
+        embeddings=embeddings,
+        allow_dangerous_deserialization=True  # safe if you created this index
+    )
 
     # --- Create retriever ---
     retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
@@ -44,7 +42,7 @@ try:
     """
     qa_prompt = PromptTemplate.from_template(template)
 
-    # --- RetrievalQA chain (RAG) ---
+    # --- RetrievalQA chain ---
     llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.3, api_key=apikey)
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
@@ -63,6 +61,7 @@ try:
     """)
 
     query = st.text_input("Type your query here:")
+
     if query:
         with st.spinner("Thinking..."):
             response = qa_chain.run(query)
@@ -70,5 +69,5 @@ try:
         st.write(response)
 
 except Exception as e:
-    st.error("❌ An error has occurred, please inform the team creators")
+    st.error("❌ An error has occured, please inform the team creators")
     print(f"Course Assistant Page Error: {e}")
