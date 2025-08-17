@@ -2,22 +2,29 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 import tiktoken
+import streamlit as st
 
 load_dotenv('env_variables.env')
 
 def getClient(role:str, username:str):
     try:
         if role == "Admin":
-            USER = os.getenv("ADMIN_USERNAME")
+            #USER = os.getenv("ADMIN_USERNAME")
+            USER = st.secrets["ADMIN"]["ADMIN_USERNAME"]
             if (username == USER):
-                SALT = os.getenv("ADMIN_SALT")
-                HASH = os.getenv("ADMIN_HASH")
+                #SALT = os.getenv("ADMIN_SALT")
+                SALT = st.secrets["ADMIN"]["ADMIN_SALT"]
+                #HASH = os.getenv("ADMIN_HASH")
+                HASH = st.secrets["ADMIN"]["ADMIN_HASH"]
                 message = [{"USER": USER, "SALT": SALT, "HASH": HASH}]
         elif role == "User":
-            USER = os.getenv("USER_USERNAME")
+           #USER = os.getenv("USER_USERNAME")
+            USER = st.secrets["USER"]["USER_USERNAME"]
             if (username == USER):
-                SALT = os.getenv("USER_SALT")
-                HASH = os.getenv("USER_HASH")
+                #SALT = os.getenv("USER_SALT")
+                SALT = st.secrets["USER"]["USER_SALT"]
+                #HASH = os.getenv("USER_HASH")
+                HASH = st.secrets["USER"]["USER_HASH"]
                 message = [{"USER": USER, "SALT": SALT, "HASH": HASH}]
     except Exception as e:
         message = None
@@ -26,7 +33,7 @@ def getClient(role:str, username:str):
 
 # Pass the API Key to the OpenAI Client
 def get_OpenAIClient():
-    client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+    client = OpenAI(api_key=st.secrets["OPENAI"]["OPENAI_API_KEY"])
 
 #get_embedding
 def get_embedding(input, model='text-embedding-3-small'):

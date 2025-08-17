@@ -3,8 +3,8 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
-from dotenv import load_dotenv
-import os
+#from dotenv import load_dotenv
+#import os
 
 st.title("Course Assistant")
 
@@ -14,9 +14,9 @@ if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
 
 try:
     # --- Load Parameters ---
-    load_dotenv("env_variables.env")  # Load from .env
-    apikey = os.getenv("OPENAI_API_KEY")
-    model_name = os.getenv("OPENAI_MODEL_NAME")
+    #load_dotenv("env_variables.env")  # Load from .env
+    apikey = st.secrets["OPENAI"]["OPENAI_API_KEY"]
+    #model_name = os.getenv("OPENAI_MODEL_NAME")
 
     # --- Load ChromaDB Vectorstore ---
     PERSIST_DIR = "./chroma_db"  # ensure this matches your saved path

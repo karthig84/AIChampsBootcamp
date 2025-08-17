@@ -8,7 +8,7 @@ from langchain.vectorstores import Chroma
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 
 # Streamlit app title
 st.title("Upload Relevant Course Details")
@@ -22,9 +22,11 @@ elif st.session_state["role"] != "Admin":
     st.stop()
 
 try:
-    load_dotenv("env_variables.env")  # Load from .env
-    apikey = os.getenv("OPENAI_API_KEY")
-    model_name = os.getenv("OPENAI_MODEL_NAME")
+    #load_dotenv("env_variables.env")  # Load from .env
+    #apikey = os.getenv("OPENAI_API_KEY")
+    #model_name = os.getenv("OPENAI_MODEL_NAME")
+    apikey = st.secrets["OPENAI"]["OPENAI_API_KEY"]
+    #model_name = st.secrets["OPENAI_MODEL_NAME"]
 
     # --- Helper function to read CSV with encoding detection ---
     def read_csv_with_fallback(path):
