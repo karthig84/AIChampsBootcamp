@@ -18,15 +18,13 @@ diagrams = [
         "title": "Diagram 2 – Admin: Course Upload Flow",
         "desc": "Admins upload course datasets, as ZIP files containing multiple CSVs. The system extracts, chunks, encodes, and stores the data into a local vector store. This structured storage enables later retrieval for recommendations."
     },
+    {"file": "images/Data_Dashboard_flow.jpg",
+        "title": "Diagram 3 – User: Course Assistant Flow",
+        "desc": "Students enter queries related to courses, career goals, or job prospects. The system retrieves relevant data from the vector store and passes it to an LLM with tailored academic advisor instructions. The LLM then generates personalised recommendations, which are returned to the student."},
     {
         "file": "images/Course_Assistant_flow.jpg",
-        "title": "Diagram 3 – Data Dashboard Flow",
+        "title": "Diagram 4 – Data Dashboard Flow",
         "desc": "Admin or user can select stored datasets for analysis and visualization. The system generates dashboards on key indicators such as enrolment and graduation breakdown by gender and course, diploma fees, employment outcomes, and median salaries by course cluster."
-    },
-    {
-        "file": "images/Data_Dashboard_flow.jpg",
-        "title": "Diagram 4 – User: Course Assistant Flow",
-        "desc": "Students enter queries related to courses, career goals, or job prospects. The system retrieves relevant data from the vector store and passes it to an LLM with tailored academic advisor instructions. The LLM then generates personalised recommendations, which are returned to the student."
     },
 ]
 
