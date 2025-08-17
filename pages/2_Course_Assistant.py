@@ -1,31 +1,30 @@
 import streamlit as st
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_community.vectorstores import Chroma
+from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
-
-
-
-
-#from dotenv import load_dotenv
-#import os
+import os
 
 st.title("Course Assistant")
 
+# Verify login
 if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
     st.error("🚫 You must log in first.")
     st.stop()
 
 try:
     # --- Load Parameters ---
-    #load_dotenv("env_variables.env")  # Load from .env
     apikey = st.secrets["OPENAI"]["OPENAI_API_KEY"]
-    #model_name = os.getenv("OPENAI_MODEL_NAME")
 
-    # --- Load ChromaDB Vectorstore ---
-    PERSIST_DIR = "./chroma_db"  # ensure this matches your saved path
-    embeddings = OpenAIEmbeddings(api_key=apikey,model='text-embedding-3-small')
-    vectorstore = Chroma(persist_directory=PERSIST_DIR, embedding_function=embeddings)
+    # --- Load FAISS Vectorstore ---
+    PERSIST_DIR = "./faiss_db"  # Update path if needed
+    embeddings = OpenAIEmbeddings(api_key=apikey, model="text-embedding-3-small")
+
+    if not os.path.exists(PERSIST_DIR):
+        st.error(f"❌ FAISS database not found at `{PERSIST_DIR}`. Please upload course data first.")
+        st.stop()
+
+    vectorstore = FAISS.load_local(PERSIST_DIR, embeddings)
 
     # --- Create retriever ---
     retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
@@ -46,7 +45,7 @@ try:
     qa_prompt = PromptTemplate.from_template(template)
 
     # --- RetrievalQA chain (RAG) ---
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.3,api_key=apikey)  # small, fast model
+    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.3, api_key=apikey)
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         retriever=retriever,
@@ -56,7 +55,6 @@ try:
 
     # --- Streamlit UI ---
     st.title("🎓 Student Course & Career Advisor")
-
     st.write("Ask personalised questions like:")
     st.markdown("""
     - *Which course suits a career in AI and data science?*  
@@ -65,12 +63,12 @@ try:
     """)
 
     query = st.text_input("Type your query here:")
-
     if query:
         with st.spinner("Thinking..."):
             response = qa_chain.run(query)
         st.subheader("💡 Recommendation")
         st.write(response)
+
 except Exception as e:
-    st.error("❌ An error has occured, please inform the team creators")
+    st.error("❌ An error has occurred, please inform the team creators")
     print(f"Course Assistant Page Error: {e}")
