@@ -18,9 +18,11 @@ diagrams = [
         "title": "Diagram 2 – Admin: Course Upload Flow",
         "desc": "Admins upload course datasets, as ZIP files containing multiple CSVs. The system extracts, chunks, encodes, and stores the data into a local vector store. This structured storage enables later retrieval for recommendations."
     },
-    {"file": "images/Data_Dashboard_flow.jpg",
+    {
+        "file": "images/Data_Dashboard_flow.jpg",
         "title": "Diagram 3 – User: Course Assistant Flow",
-        "desc": "Students enter queries related to courses, career goals, or job prospects. The system retrieves relevant data from the vector store and passes it to an LLM with tailored academic advisor instructions. The LLM then generates personalised recommendations, which are returned to the student."},
+        "desc": "Students enter queries related to courses, career goals, or job prospects. The system retrieves relevant data from the vector store and passes it to an LLM with tailored academic advisor instructions. The LLM then generates personalised recommendations, which are returned to the student."
+    },
     {
         "file": "images/Course_Assistant_flow.jpg",
         "title": "Diagram 4 – Data Dashboard Flow",
@@ -36,13 +38,28 @@ for diagram in diagrams:
         # Numbered header
         st.subheader(diagram["title"])
         
-        # Side-by-side layout
-        col1, col2 = st.columns([1, 2])
+        # Side-by-side layout (image gets more space now)
+        col1, col2 = st.columns([1, 1])  
         with col1:
-            st.image(image, use_container_width=True)
+            st.image(image, use_container_width=True)  # larger, fits column width
         with col2:
-            st.markdown(diagram["desc"])
+            # Use HTML to increase font size for readability
+            st.markdown(f"<p style='font-size:24px;'>{diagram['desc']}</p>", unsafe_allow_html=True)
         
         st.markdown("---")  # separator line
     else:
         st.warning(f"{diagram['file']} not found in the project folder.")
+
+
+with st.expander("Disclaimer"):
+    disclaimer = """
+    **IMPORTANT NOTICE**  
+    This web application is a prototype developed for educational purposes only.  
+    The information provided here is **NOT** intended for real-world usage and should not be relied upon for making decisions, especially financial, legal, or healthcare matters.  
+
+    Furthermore, please be aware that the LLM may generate inaccurate or incorrect information.  
+    You assume full responsibility for how you use any generated output.  
+
+    Always consult with qualified professionals for accurate and personalized advice. 
+    """
+    st.markdown(disclaimer)

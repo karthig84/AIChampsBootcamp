@@ -71,3 +71,12 @@ try:
 except Exception as e:
     st.error("❌ An error has occured, please inform the team creators")
     print(f"Course Assistant Page Error: {e}")
+
+with st.expander("Disclaimer"):
+    
+    # Add disclaimer with new lines
+    disclaimer = """
+    **IMPORTANT NOTICE**: This web application is a prototype developed for educational purposes only. The information provided here is NOT intended for real-world usage and should not be relied upon for making any decisions, especially those related to financial, legal, or healthcare matters.\n\nFurthermore, please be aware that the LLM may generate inaccurate or incorrect information. You assume full responsibility for how you use any generated output.\n\nAlways consult with qualified professionals for accurate and personalized advice. 
+   
+    """
+    st.markdown(disclaimer)
