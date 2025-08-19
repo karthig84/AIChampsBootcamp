@@ -16,9 +16,6 @@ def verify_password(role: str, input_username: str, input_password: str) -> bool
     retvalue = False
     try:
         msg = llm.getClient(role, input_username)
-        print(f"user111: {msg[0]["USER"]}")
-        print(f"salt111: {msg[0]["SALT"]}")
-        print(f"hash222: {msg[0]["HASH"]}")      
         if (msg is not None):
             retvalue = hash_password(input_password, msg[0]["SALT"]) == msg[0]["HASH"]
     except Exception as e:

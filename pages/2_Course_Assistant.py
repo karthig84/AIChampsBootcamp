@@ -1,9 +1,49 @@
 import streamlit as st
+import re
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 
+# --- Security Config ---
+FORBIDDEN_PATTERNS = [
+    r"ignore previous instructions",
+    r"system prompt",
+    r"hidden instructions",
+    r"internal instructions",
+    r"reveal secret",
+    r"output hidden",
+    r"hidden",
+    r"revealing",
+    r"python script",
+    r"exfiltrate"
+]
+
+SENSITIVE_KEYWORDS = [
+    "system instructions",
+    "hidden instructions",
+    "developer prompt",
+    "template value",
+    "API Key"
+]
+
+def is_suspicious(user_input: str) -> bool:
+    """
+    Detect if the user input contains prompt injection attempts.
+    """
+    user_input_lower = user_input.lower()
+    return any(re.search(pattern, user_input_lower) for pattern in FORBIDDEN_PATTERNS)
+
+def sanitize_output(output: str) -> str:
+    """
+    Redact any sensitive keywords accidentally revealed in the output.
+    """
+    sanitized = output
+    for keyword in SENSITIVE_KEYWORDS:
+        sanitized = re.sub(keyword, "[REDACTED]", sanitized, flags=re.IGNORECASE)
+    return sanitized
+
+# --- Streamlit UI ---
 st.title("Course Assistant")
 
 # --- Login Check ---
@@ -51,7 +91,7 @@ try:
         chain_type_kwargs={"prompt": qa_prompt}
     )
 
-    # --- Streamlit UI ---
+    # --- Streamlit UI for query ---
     st.title("🎓 Student Course & Career Advisor")
     st.write("Ask personalised questions like:")
     st.markdown("""
@@ -63,20 +103,28 @@ try:
     query = st.text_input("Type your query here:")
 
     if query:
-        with st.spinner("Thinking..."):
-            response = qa_chain.run(query)
-        st.subheader("💡 Recommendation")
-        st.write(response)
+        if is_suspicious(query):
+            st.warning("⚠️ Your query contains suspicious instructions and cannot be processed.")
+        else:
+            with st.spinner("Thinking..."):
+                response = qa_chain.run(query)
+            sanitized_response = sanitize_output(response)
+            st.subheader("💡 Recommendation")
+            st.write(sanitized_response)
 
 except Exception as e:
-    st.error("❌ An error has occured, please inform the team creators")
+    st.error("❌ An error has occurred, please inform the team creators")
     print(f"Course Assistant Page Error: {e}")
 
 with st.expander("Disclaimer"):
-    
-    # Add disclaimer with new lines
     disclaimer = """
-    **IMPORTANT NOTICE**: This web application is a prototype developed for educational purposes only. The information provided here is NOT intended for real-world usage and should not be relied upon for making any decisions, especially those related to financial, legal, or healthcare matters.\n\nFurthermore, please be aware that the LLM may generate inaccurate or incorrect information. You assume full responsibility for how you use any generated output.\n\nAlways consult with qualified professionals for accurate and personalized advice. 
-   
+    **IMPORTANT NOTICE**  
+    This web application is a prototype developed for educational purposes only.  
+    The information provided here is **NOT** intended for real-world usage and should not be relied upon for making decisions, especially financial, legal, or healthcare matters.  
+
+    Furthermore, please be aware that the LLM may generate inaccurate or incorrect information.  
+    You assume full responsibility for how you use any generated output.  
+
+    Always consult with qualified professionals for accurate and personalized advice. 
     """
     st.markdown(disclaimer)

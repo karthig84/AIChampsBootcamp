@@ -13,7 +13,7 @@ def login():
         password = st.text_input("Password", type="password")
 
         if st.button("Login"):            
-            print(f"Role:",role)
+            #print(f"Role:",role)
             if(security.verify_password(role, username, password)):
                 st.session_state["logged_in"] = True
                 st.session_state["role"] = role
